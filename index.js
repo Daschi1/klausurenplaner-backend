@@ -17,7 +17,7 @@ try {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    app.get("/klasuren", async (req, res) => {
+    app.get("/klausuren", async (req, res) => {
         try {
             const result = await collection.find().toArray();
             console.log(result);
