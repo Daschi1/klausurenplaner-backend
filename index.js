@@ -1,9 +1,10 @@
+
 const express = require("express");
 const MongoClient = require("mongodb").MongoClient;
 
 const dbName = "klausurenplaner";
 const mongoUri = `mongodb+srv://user:password123456@cluster0.pn9b9.mongodb.net/test`;
-const collectionName = "klausur";
+const collectionName = "klausuren";
 
 async function main() {
 const app = express();
@@ -16,7 +17,7 @@ try {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    app.get("/klasur", async (req, res) => {
+    app.get("/klasuren", async (req, res) => {
         try {
             const result = await collection.find().toArray();
             console.log(result);
@@ -27,7 +28,7 @@ try {
             }
     });
 
-    app.get("/klasuur/:klausurId", async (req, res) => {
+    app.get("/klausuren/:klausurId", async (req, res) => {
         try {
             const id = req.params.klausurId;
             console.log(`Received request for klausur ${id}`);
