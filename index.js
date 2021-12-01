@@ -2,7 +2,7 @@ const express = require("express");
 const MongoClient = require("mongodb").MongoClient;
 
 const dbName = "klausurenplaner";
-const mongoUri = `mongodb://user:password123456@localhost:27017/${dbName}`;
+const mongoUri = `mongodb+srv://user:password123456@cluster0.pn9b9.mongodb.net/test`;
 const collectionName = "klausur";
 
 async function main() {
