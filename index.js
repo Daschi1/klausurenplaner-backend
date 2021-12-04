@@ -84,7 +84,7 @@ try {
         }
     });
     
-    app.post("addTodo(:todo)", async (req, res) => {
+    app.post("addTodo(:klausurId)", async (req, res) => {
         //TODO
     });
 
