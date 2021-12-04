@@ -25,7 +25,7 @@ try {
 
 
 
-    app.get("/klausurs", async (req, res) => {
+    app.get("/getKlausurs", async (req, res) => {
         try {
             const result = await collection.find().toArray();
             console.log(result);
@@ -36,7 +36,7 @@ try {
             }
     });
 
-    app.get("/klausur(:klausurId)", async(req, res) => {
+    app.get("/getKlausur(:klausurId)", async(req, res) => {
         try {
             const id = req.params.klausurId
             id_string = `${id}`;
