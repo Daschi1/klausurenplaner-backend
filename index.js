@@ -69,8 +69,11 @@ try {
     });
 
 
-    app.post("/addKlausur(:klausur)", async (req, res) => {
+    app.post("/addKlausur", async (req, res) => {
         try {
+            //Code erstmal so von Herrn Schulz übernommen, noch nicht auf uns zugeschnitten
+            //Todo: random long generieren und als "klausurId" mit der Klausur in Datenbank einpflegen
+            //evtl. hier bereits ein (noch) leeres Array "todos" anlegen
             const data = req.body;
             const result = await collection.insertOne(data);
             const id = result.insertedId; // unique Id from MongoDB
