@@ -59,17 +59,6 @@ try {
             res.status(500).send(err);
         }
     });
-
-    app.get("/klausuren/:klausurId", async (req, res) => {
-        try {
-            const id = req.params.klausurId;
-            console.log(`Received request for klausur ${id}`);
-            // TODO
-        } catch (err) {
-            console.error(err);
-            res.status(500).send(err);
-        }
-    });
     
     app.get("/getTodos(:klausurId)", async (req, res) => {
         //TODO
