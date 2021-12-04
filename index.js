@@ -71,9 +71,17 @@ try {
             res.status(500).send(err);
         }
     });
+    
+    app.get("/getTodos(:klausurId)", async (req, res) => {
+        //TODO
+    });
+    
+    app.get("/getTodo(:klausurId, :id)", async (req, res) => {
+        //TODO
+    });
 
 
-    app.post("/items", async (req, res) => {
+    app.post("/addKlausur(:klausur)", async (req, res) => {
         try {
             const data = req.body;
             const result = await collection.insertOne(data);
@@ -87,12 +95,20 @@ try {
             res.status(500).send(err);
         }
     });
+    
+    app.post("addTodo(:todo)", async (req, res) => {
+        //TODO
+    });
 
-    app.put("/items/:itemId", (req, res) => {
+    app.put("/updateTodo(:id,:completed)", async (req, res) => {
     // TODO
     });
 
-    app.delete("/items/:itemId", (req, res) => {
+    app.delete("/deleteKlausur(:klausurId)", async (req, res) => {
+    // TODO
+    });
+    
+    app.delete("/deleteTodo(:id)", async (req, res) => {
     // TODO
     });
 
