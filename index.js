@@ -1,4 +1,3 @@
-
 const express = require("express");
 const MongoClient = require("mongodb").MongoClient;
 
@@ -40,20 +39,45 @@ try {
     app.get("/klausur(:klausurId)", async(req, res) => {
         try {
             const id = req.params.klausurId
-            id_string = `${id}`;
-            klausur = await collection.find({"klausurId": id_string}).toArray();
-            postleitzahl = klausur[0].plz;
+            let id_string = `${id}`;
+            let klausur = await collection.find({"klausurId": id_string}).toArray();
+            let postleitzahl = klausur[0].plz;
+
+            let output_obj = {
+                "klausurId": undefined,
+                "name": undefined,
+                "date": undefined,
+                "plz": undefined,
+                "weather": {
+                    "main": undefined,
+                    "degrees": undefined
+                }
+            };
 
             geo_function(postleitzahl, (latitude, longitude) => {
                 wetter_function(latitude, longitude, wetter_response => {
                 
-                klausur[0].weather.main = wetter_response.current.weather[0].main;
-                klausur[0].weather.degrees = wetter_response.current.temp;
-                //CAVE, AKTUELLE Wetterdaten an Klasurort
-                //Todo: Zeitabgleich und Vergabe zukünftiger Wetterdaten/Errormeldung
-                res.send(klausur[0]);
+
+                output_obj.klausurId = klausur[0].klausurId;
+                output_obj.name = klausur[0].name;
+                output_obj.date = klausur[0].date;
+                output_obj.plz = klausur[0].plz;
+
+                for(i=0; i<7; i++){
+                    w_date = new Date(wetter_response.daily[i].dt*1000);
+                    k_date = new Date(klausur[0].date*1000);
+                    if(w_date.getYear()==k_date.getYear() && w_date.getMonth()==k_date.getMonth() && w_date.getDate()==k_date.getDate()){
+                        output_obj.weather.main = wetter_response.daily[i].weather[0].main;
+                        output_obj.weather.degrees = wetter_response.daily[i].temp.day;
+                        console.log("Day Match found");
+                        break;
+                    }
+                }
+            
+
+                res.send(output_obj);
             });
-            });
+        });
 
         } catch (err) {
             console.error(err);
@@ -71,17 +95,9 @@ try {
             res.status(500).send(err);
         }
     });
-    
-    app.get("/getTodos(:klausurId)", async (req, res) => {
-        //TODO
-    });
-    
-    app.get("/getTodo(:klausurId, :id)", async (req, res) => {
-        //TODO
-    });
 
 
-    app.post("/addKlausur(:klausur)", async (req, res) => {
+    app.post("/items", async (req, res) => {
         try {
             const data = req.body;
             const result = await collection.insertOne(data);
@@ -95,20 +111,12 @@ try {
             res.status(500).send(err);
         }
     });
-    
-    app.post("addTodo(:todo)", async (req, res) => {
-        //TODO
-    });
 
-    app.put("/updateTodo(:id,:completed)", async (req, res) => {
+    app.put("/items/:itemId", (req, res) => {
     // TODO
     });
 
-    app.delete("/deleteKlausur(:klausurId)", async (req, res) => {
-    // TODO
-    });
-    
-    app.delete("/deleteTodo(:id)", async (req, res) => {
+    app.delete("/items/:itemId", (req, res) => {
     // TODO
     });
 
@@ -141,8 +149,6 @@ geo_function = function(plz, callback){
         res.on('data', chunk => {
           geo_response += chunk;
           geo_response_json = JSON.parse(geo_response);
-          //console.log("Latitude ", geo_response_json[0].lat);
-          //console.log("Longitude ", geo_response_json[0].lon);
         });
 
         res.on('end', () => {
