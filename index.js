@@ -1,5 +1,6 @@
 const express = require("express");
 const MongoClient = require("mongodb").MongoClient;
+const cors = require('cors');
 
 
 const http = require("http");
@@ -13,6 +14,7 @@ const owm_appid = "db61d57b3aa133a380b4fd0aa768a31d";
 
 async function main() {
 const app = express();
+app.use(cors());
 app.use(express.json()); // parsing the request body
 let client;
 
@@ -27,9 +29,13 @@ try {
 
     app.get("/get/klausurs", async (req, res) => {
         try {
+            let return_object = {
+                "klausurs": []
+            };
             const result = await collection.find().toArray();
-            console.log(result);
-            res.send(result);
+            return_object.klausurs = result;
+            console.log(return_object);
+            res.send(return_object);
         } catch (err) {
             console.error(err);
             res.status(500).send(err);
@@ -64,9 +70,13 @@ try {
                 output_obj.date = klausur[0].date;
                 output_obj.plz = klausur[0].plz;
 
+                console.log(latitude);
+                console.log(longitude);
+                console.log(wetter_response);
+
                 for(i=0; i<7; i++){
-                    w_date = new Date(wetter_response.daily[i].dt);
-                    k_date = new Date(klausur[0].date*1000);
+                    w_date = new Date(wetter_response.daily[i].dt*1000);
+                    k_date = new Date(klausur[0].date);
                     if(w_date.getYear()==k_date.getYear() && w_date.getMonth()==k_date.getMonth() && w_date.getDate()==k_date.getDate()){
                         output_obj.weather.main = wetter_response.daily[i].weather[0].main;
                         output_obj.weather.degrees = wetter_response.daily[i].temp.day;
@@ -121,9 +131,9 @@ try {
             let klausurId = getRandomInt(Number.MAX_SAFE_INTEGER);
 
             db_object.klausurId = String(klausurId);
-            db_object.name = data.name;     //req.query.name
-            db_object.date = data.date;     //req.query.date
-            db_object.plz = data.plz;       //req.query.plz
+            db_object.name = data.name;    
+            db_object.date = data.date;     
+            db_object.plz = data.plz;       
 
             const result = await collection.insertOne(db_object);
 
@@ -159,7 +169,7 @@ try {
     app.put("/update/todo/:id", async (req, res) => {
         try {
             const id = Number(req.params.id);
-            const todo_completed = req.query.completed === undefined? false:true;  ///todo/111?completed={irgendwas} -> True; todo/111 -> False
+            const todo_completed = req.query.completed === undefined? false:true;
             console.log(id);
             console.log(todo_completed);
 
@@ -174,43 +184,14 @@ try {
                 }
                 else {i+=1;}
             }
-            console.log("TodoIndex:", todo_index);
 
-            todostring = `todos.${todo_index}.completed`;
-
-            console.log("Todostring:", todostring);
-
-            switch(todo_index){
-                case 0: collection.updateOne({"todos.id": id}, {$set: {"todos.0.completed": todo_completed}}); break;       //Welp, guess at which point it was 3 am and I had yelled at JS for a while 
-                case 1: collection.updateOne({"todos.id": id}, {$set: {"todos.1.completed": todo_completed}}); break;       //and then just gave up
-                case 2: collection.updateOne({"todos.id": id}, {$set: {"todos.2.completed": todo_completed}}); break;
-                case 3: collection.updateOne({"todos.id": id}, {$set: {"todos.3.completed": todo_completed}}); break;
-                case 4: collection.updateOne({"todos.id": id}, {$set: {"todos.4.completed": todo_completed}}); break;
-                case 5: collection.updateOne({"todos.id": id}, {$set: {"todos.5.completed": todo_completed}}); break;
-                case 6: collection.updateOne({"todos.id": id}, {$set: {"todos.6.completed": todo_completed}}); break;
-                case 7: collection.updateOne({"todos.id": id}, {$set: {"todos.7.completed": todo_completed}}); break;
-                case 8: collection.updateOne({"todos.id": id}, {$set: {"todos.8.completed": todo_completed}}); break;
-                case 9: collection.updateOne({"todos.id": id}, {$set: {"todos.9.completed": todo_completed}}); break;
-                case 10: collection.updateOne({"todos.id": id}, {$set: {"todos.10.completed": todo_completed}}); break;
-                case 11: collection.updateOne({"todos.id": id}, {$set: {"todos.11.completed": todo_completed}}); break;
-                case 12: collection.updateOne({"todos.id": id}, {$set: {"todos.12.completed": todo_completed}}); break;
-                case 13: collection.updateOne({"todos.id": id}, {$set: {"todos.13.completed": todo_completed}}); break;
-                case 14: collection.updateOne({"todos.id": id}, {$set: {"todos.14.completed": todo_completed}}); break;
-                case 15: collection.updateOne({"todos.id": id}, {$set: {"todos.15.completed": todo_completed}}); break;
-                case 16: collection.updateOne({"todos.id": id}, {$set: {"todos.16.completed": todo_completed}}); break;
-                case 17: collection.updateOne({"todos.id": id}, {$set: {"todos.17.completed": todo_completed}}); break;
-                case 18: collection.updateOne({"todos.id": id}, {$set: {"todos.18.completed": todo_completed}}); break;
-                case 19: collection.updateOne({"todos.id": id}, {$set: {"todos.19.completed": todo_completed}}); break;
-
-                default: break;
-            }
-           
-            /*
-            collection.updateOne(
+            todostring = `todos.${todo_index}.completed`;         
+            
+             collection.updateOne(
                 {"todos.id": id},
-                {$set: {todostring: todo_completed}}
+                {$set: {[todostring]: todo_completed}}
             );
-*/
+            
             res.status(200).send();
         } catch (err) {
             console.error(err);
@@ -262,10 +243,6 @@ console.error(err);
 }
 }
 main().catch((err) => console.err(err));
-
-
-
-
 
 
 
