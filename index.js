@@ -174,7 +174,7 @@ try {
             newTodo.important = data.important;
 
             let result = await collection.updateOne(
-                {"klausurId": "222"},
+                {"klausurId": klausurId},
                 {
                 $push: {
                     todos: newTodo
