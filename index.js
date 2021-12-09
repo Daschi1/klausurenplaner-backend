@@ -157,8 +157,38 @@ try {
         try {
             let data = req.body;
             let klausurId = data.klausurId;
+
             console.log(`Received request to post todo in klausur ${klausurId}`);
-            // TODO
+
+            let newTodo = {
+                "id": undefined,
+                "task": undefined,
+                "important": undefined,
+                "completed": false
+            }
+
+            let todoId = getRandomInt(Number.MAX_SAFE_INTEGER);
+
+            newTodo.id = todoId;
+            newTodo.task = data.task;
+            newTodo.important = data.important;
+
+            let result = await collection.updateOne(
+                {"klausurId": "222"},
+                {
+                $push: {
+                    todos: newTodo
+                    }
+                }
+            );
+
+            if(result.acknowledged){
+                res.status(200).end();
+            }
+            else {
+                console.log("Unable to enter object into database");
+                res.status(500).send("Object could not be entered into database.");}
+
         } catch (err) {
             console.error(err);
             res.status(500).send(err);
@@ -219,12 +249,42 @@ try {
             res.status(500).send(err);
         }
     });
+    
 
     app.delete("/delete/todo/:todoId", async (req, res) => {
         try {
-            const todoId = req.params.klausurId;
-            console.log(`Received request to delete the Todo ${todo_id}`);
-            // TODO
+            const todoId = Number(req.params.todoId);
+            console.log(`Received request to delete the Todo ${todoId}`);
+
+            let i = 0;
+            let klausur = await collection.find({"todos.id": todoId}).toArray();
+            let klausurId = klausur[0].klausurId;
+
+            while(klausur[0].todos[i]!== undefined){
+                if(klausur[0].todos[i].id==todoId){
+                    todo_index = i; break;
+                }
+                else {i+=1;}
+            }
+
+            del_todo = klausur[0].todos[i];
+
+            todostring = `todos.${todo_index}.completed`;
+            
+            result = await collection.updateOne(
+                {"klausurId": klausurId},
+                {$pull: {"todos": del_todo}}
+            );
+
+            if (result.acknowledged){
+                res.status(200).end();
+            }
+            else {
+                console.log("Unable to delete object from database");
+                res.status(500).send("Object could not be deleted from database.");}
+
+
+        
         } catch (err) {
             console.error(err);
             res.status(500).send(err);
