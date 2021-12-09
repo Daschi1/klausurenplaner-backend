@@ -169,7 +169,7 @@ try {
 
             let todoId = getRandomInt(Number.MAX_SAFE_INTEGER);
 
-            newTodo.id = todoId;
+            newTodo.id = String(todoId);
             newTodo.task = data.task;
             newTodo.important = data.important;
 
@@ -198,7 +198,7 @@ try {
 
     app.put("/update/todo/:id", async (req, res) => {
         try {
-            const id = Number(req.params.id);
+            const id = String(req.params.id);
             const todo_completed = req.query.completed === undefined? false:true;
             console.log(id);
             console.log(todo_completed);
@@ -253,7 +253,7 @@ try {
 
     app.delete("/delete/todo/:todoId", async (req, res) => {
         try {
-            const todoId = Number(req.params.todoId);
+            const todoId = String(req.params.todoId);
             console.log(`Received request to delete the Todo ${todoId}`);
 
             let i = 0;
