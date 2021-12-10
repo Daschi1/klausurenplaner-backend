@@ -128,7 +128,12 @@ try {
             }
 
             let data = req.body;
-            let klausurId = getRandomInt(Number.MAX_SAFE_INTEGER);
+            let klausurId;
+            let check; 
+            do {
+                klausurId = String(getRandomInt(Number.MAX_SAFE_INTEGER));
+                check = await collection.find({"klausurId": klausurId}).count();
+            } while (check != 0);
 
             db_object.klausurId = String(klausurId);
             db_object.name = data.name;    
