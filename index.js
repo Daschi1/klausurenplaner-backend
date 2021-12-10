@@ -146,7 +146,7 @@ try {
                 const id = result.insertedId; // unique Id from MongoDB
 
                 console.log(`Inserted document ${id}`);
-                res.status(201).end();
+                res.send(db_object);
             }
             else {
                 console.log("Unable to enter object into database");
@@ -188,7 +188,7 @@ try {
             );
 
             if(result.acknowledged){
-                res.status(200).end();
+                res.send(newTodo);
             }
             else {
                 console.log("Unable to enter object into database");
